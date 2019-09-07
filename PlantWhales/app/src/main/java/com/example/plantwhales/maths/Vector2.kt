@@ -15,4 +15,6 @@ data class Vector2(var x: Float, var y: Float) {
         this.x *= scalar.toFloat()
         this.y *= scalar.toFloat()
     }
+
+    operator fun times(scalar: Number) = Vector2(this.x * scalar.toFloat(), this.y * scalar.toFloat())
 }
