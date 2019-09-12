@@ -12,8 +12,12 @@ import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.views.CanvasView
 
 class Game(private val hostActivity: Activity) {
+    companion object {
+        lateinit var screenSize: Vector2
+    }
+
     private val gameObjects: ArrayList<GameObject> = ArrayList()
-    val canvas: CanvasView = CanvasView(hostActivity.applicationContext)
+    private val canvas: CanvasView = CanvasView(hostActivity.applicationContext)
 
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
@@ -24,10 +28,8 @@ class Game(private val hostActivity: Activity) {
         }
     }
 
-
-
     fun start() {
-        init()
+        init(Player(Circle(5f, arrayOf(255, 255, 0, 255))))
         hostActivity.setContentView(canvas)
         loopHandler.post(gameLoop)
     }
@@ -38,14 +40,22 @@ class Game(private val hostActivity: Activity) {
 
     // Game Setup
     // TODO find better solution for this
-    private fun init() {
+    private fun init(vararg objectsToInit: GameObject) {
         val vto = canvas.viewTreeObserver
         vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                // Player Creation (elsewhere the canvas dimensions can't be accessed, width and height are 0)
-                val player = Player(Vector2(canvas.width / 2f, canvas.height - 50f), Circle(50f, arrayOf(255, 255, 255, 0)))
-                gameObjects.add(player)
+                // Set Screen Size
+                screenSize = Vector2(canvas.width.toFloat(), canvas.height.toFloat())
 
+                // Initialize GameObjects
+                for (gameObject: GameObject in objectsToInit) {
+                    gameObjects.add(gameObject)
+                }
+
+                // Call Start on GameObjects
+                for (gameObject: GameObject in gameObjects) {
+                    gameObject.start()
+                }
 
                 val obs = canvas.viewTreeObserver
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -54,7 +64,6 @@ class Game(private val hostActivity: Activity) {
                     obs.removeGlobalOnLayoutListener(this)
                 }
             }
-
         })
     }
 
@@ -70,6 +79,4 @@ class Game(private val hostActivity: Activity) {
         canvas.objectsToDraw = this.gameObjects
         canvas.invalidate() // redraws
     }
-
-
 }
