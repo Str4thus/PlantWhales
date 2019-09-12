@@ -1,19 +1,26 @@
 package com.example.plantwhales.gameobjects
 
-import android.util.Log
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.InputSystem
+import com.example.plantwhales.gamelogic.Time
 import com.example.plantwhales.maths.Vector2
+import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.shapes.Shape
 
 
 class Player(override var shape: Shape) : GameObject() {
+    var triggerd: Boolean = false
 
     override fun start() {
-        this.position = Game.screenSize
+        this.position = Vector2(Game.screenSize.x / 2, Game.screenSize.y - 50f)
     }
 
-    override fun update() {
+    override fun cycle() {
         this.position.x = InputSystem.touchPosition?.x ?: this.position.x
+
+        if (!triggerd && this.position.x > Game.screenSize.x / 2) {
+            Game.addGameObject(Projectile(Circle(80f, arrayOf(255, 255, 0, 0))))
+            triggerd = true
+        }
     }
 }

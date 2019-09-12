@@ -1,6 +1,7 @@
 package com.example.plantwhales.gamelogic
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.util.Log
@@ -11,51 +12,46 @@ import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.views.CanvasView
 
-class Game(private val hostActivity: Activity) {
-    companion object {
-        lateinit var screenSize: Vector2
-    }
-
+object Game {
     private val gameObjects: ArrayList<GameObject> = ArrayList()
-    private val canvas: CanvasView = CanvasView(hostActivity.applicationContext)
-
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
+        private var time: Long = 0L
+        private var lastTime: Long = 0L
+
         override fun run() {
-            update()
-            draw()
+            // Calculate delta time
+            time = Time.currentTime()
+            Time.setDeltaTime((time - lastTime))
+            lastTime = time
+
+            if (!isPaused) {
+                update()
+                draw()
+            }
+
             loopHandler.post(this)
         }
     }
 
-    fun start() {
-        init(Player(Circle(5f, arrayOf(255, 255, 0, 255))))
-        hostActivity.setContentView(canvas)
-        loopHandler.post(gameLoop)
-    }
+    lateinit var screenSize: Vector2 private set
+    lateinit var canvas: CanvasView private set
 
-    fun addGameObject(obj: GameObject) {
-        gameObjects.add(obj)
-    }
+    var isRunning: Boolean = false
+    var isPaused: Boolean = false
 
     // Game Setup
-    // TODO find better solution for this
-    private fun init(vararg objectsToInit: GameObject) {
+    private fun init(hostActivity: Activity) {
+        /** Creating canvas **/
+        canvas = CanvasView(hostActivity.applicationContext)
+
         val vto = canvas.viewTreeObserver
         vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                // Set Screen Size
+
+                /** Set global Game Properties **/
                 screenSize = Vector2(canvas.width.toFloat(), canvas.height.toFloat())
-
-                // Initialize GameObjects
-                for (gameObject: GameObject in objectsToInit) {
-                    gameObjects.add(gameObject)
-                }
-
-                // Call Start on GameObjects
-                for (gameObject: GameObject in gameObjects) {
-                    gameObject.start()
-                }
+                /*****************************/
 
                 val obs = canvas.viewTreeObserver
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -67,6 +63,31 @@ class Game(private val hostActivity: Activity) {
         })
     }
 
+    // Game Start
+    fun start(hostActivity: Activity) {
+        if (!isRunning) {
+            /** Create GameObjects that need to be there in the beginning **/
+            gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
+            /***************************************************************/
+
+            init(hostActivity)
+            hostActivity.setContentView(canvas)
+
+            loopHandler.post(gameLoop)
+            isRunning = true
+        }
+    }
+
+    fun pause() {
+        if (this.isRunning)
+            this.isPaused = true
+    }
+
+    fun unpause() {
+        if (this.isRunning)
+            this.isPaused = false
+    }
+
     // Game Logic
     private fun update() {
         for (gameObject: GameObject in gameObjects) {
@@ -76,7 +97,12 @@ class Game(private val hostActivity: Activity) {
 
     // Display Objects
     private fun draw() {
-        canvas.objectsToDraw = this.gameObjects
-        canvas.invalidate() // redraws
+        canvas.objectsToDraw = gameObjects
+        canvas.invalidate() // redraw
+    }
+
+    /** DO NOT ADD GAME OBJECTS VIA THE MAIN THREAD (?) **/
+    fun addGameObject(gameObject: GameObject) {
+        gameObjects.add(gameObject)
     }
 }

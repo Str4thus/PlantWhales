@@ -9,21 +9,29 @@ import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.InputSystem
 
 class GameActivity : AppCompatActivity() {
-    private lateinit var game: Game
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-
-        game = Game(this)
-        game.start()
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
+    override fun onResume() {
+        super.onResume()
+        Game.unpause()
     }
+
+    override fun onPause() {
+        super.onPause()
+        Game.pause()
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         InputSystem.handle(event)
         return false
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        /** Start the Game **/
+        Game.start(this)
+        return super.onPrepareOptionsMenu(menu)
     }
 }
