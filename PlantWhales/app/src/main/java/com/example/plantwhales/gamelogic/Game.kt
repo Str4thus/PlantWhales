@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import android.view.ViewTreeObserver
+import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.gameobjects.GameObject
 import com.example.plantwhales.gameobjects.Player
 import com.example.plantwhales.maths.Vector2
@@ -26,6 +27,10 @@ object Game {
             lastTime = time
 
             if (!isPaused) {
+                freeObjects()
+                checkForCollisions()
+                freeObjects()
+
                 update()
                 draw()
             }
@@ -33,6 +38,8 @@ object Game {
             loopHandler.post(this)
         }
     }
+
+    private val objectsToDelete: ArrayList<GameObject> = ArrayList()
 
     lateinit var screenSize: Vector2 private set
     lateinit var canvas: CanvasView private set
@@ -88,6 +95,13 @@ object Game {
             this.isPaused = false
     }
 
+    // Collision Checking
+    private fun checkForCollisions() {
+        for (gameObject: GameObject in gameObjects) {
+            gameObject.checkForCollisions()
+        }
+    }
+
     // Game Logic
     private fun update() {
         for (gameObject: GameObject in gameObjects) {
@@ -104,5 +118,21 @@ object Game {
     /** DO NOT ADD GAME OBJECTS VIA THE MAIN THREAD (?) **/
     fun addGameObject(gameObject: GameObject) {
         gameObjects.add(gameObject)
+    }
+
+    fun getGameObjects(): ArrayList<GameObject> {
+        return gameObjects
+    }
+
+    fun freeObjects() {
+        for (gameObject: GameObject in this.objectsToDelete) {
+            gameObjects.remove(gameObject)
+        }
+
+        this.objectsToDelete.clear()
+    }
+
+    fun requestDelete(gameObject: GameObject) {
+        this.objectsToDelete.add(gameObject)
     }
 }
