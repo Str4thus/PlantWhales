@@ -3,31 +3,28 @@ package com.example.plantwhales.gameobjects
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
-import com.example.plantwhales.gamelogic.InputSystem
+import com.example.plantwhales.gamelogic.Physics
 import com.example.plantwhales.gamelogic.Time
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.shapes.Shape
+import kotlin.random.Random
 
-
-class Player(override var shape: Shape) : GameObject() {
+class Projectile(override var shape: Shape) : GameObject() {
     override var collider: Collider = CircleCollider(this, (shape as Circle).radius)
-    var triggerd: Boolean = false
+    private val r: Random = Random(84309)
+    private var speedMultiplier: Float = 2.5f
 
     override fun start() {
-        this.position = Vector2(Game.screenSize.x / 2, Game.screenSize.y - 50f)
+        val xPos: Float = r.nextDouble(0.0, Game.screenSize.x.toDouble()).toFloat()
+        this.position = Vector2(xPos, 50f)
     }
 
     override fun cycle() {
-        this.position.x = InputSystem.touchPosition?.x ?: this.position.x
-
-        if (!triggerd && this.position.x > Game.screenSize.x / 2) {
-            Game.addGameObject(Projectile(Circle(80f, arrayOf(255, 255, 0, 0))))
-            triggerd = true
-        }
+        this.position += Physics.gravity * speedMultiplier * Time.deltaTime
     }
 
     override fun onCollision(other: Collider) {
-
+        Game.requestDelete(this)
     }
 }

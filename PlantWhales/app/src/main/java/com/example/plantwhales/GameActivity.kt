@@ -1,21 +1,37 @@
 package com.example.plantwhales
 
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MotionEvent
 import com.example.plantwhales.gamelogic.Game
-import com.example.plantwhales.gameobjects.Player
-import com.example.plantwhales.maths.Vector2
-import com.example.plantwhales.shapes.Circle
+import com.example.plantwhales.gamelogic.InputSystem
 
 class GameActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
+    }
 
-        val game: Game = Game(this)
-        val player: Player = Player(Vector2(100f, 100f), Circle(10f, arrayOf(255, 255, 255, 0)))
-        game.addGameObject(player)
-        game.start()
+    override fun onResume() {
+        super.onResume()
+        Game.unpause()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Game.pause()
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        InputSystem.handle(event)
+        return false
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        /** Start the Game **/
+        Game.start(this)
+        return super.onPrepareOptionsMenu(menu)
     }
 }
