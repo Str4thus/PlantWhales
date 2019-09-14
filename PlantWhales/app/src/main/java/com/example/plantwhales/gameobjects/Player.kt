@@ -31,14 +31,11 @@ class Player(override var shape: Shape) : GameObject() {
     }
 
     override fun onCollision(other: Collider) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.}
     }
 
     override fun onBecameVisible() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onBecameInvisible() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.}
     }
 }
