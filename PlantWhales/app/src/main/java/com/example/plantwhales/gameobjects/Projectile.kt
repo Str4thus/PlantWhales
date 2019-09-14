@@ -1,5 +1,6 @@
 package com.example.plantwhales.gameobjects
 
+import android.util.Log
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
@@ -28,4 +29,8 @@ class Projectile(override var shape: Shape) : GameObject() {
         Game.pause()
         //Game.requestDelete(this)
     }
+
+    override fun onBecameVisible() {}
+    
+    override fun onBecameInvisible() {}
 }

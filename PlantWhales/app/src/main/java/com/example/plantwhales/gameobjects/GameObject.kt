@@ -17,6 +17,8 @@ abstract class GameObject {
     abstract fun start()
     abstract fun cycle()
     abstract fun onCollision(other: Collider)
+    abstract fun onBecameVisible()
+    abstract fun onBecameInvisible()
 
     fun update() {
         if (!started) {
@@ -24,11 +26,17 @@ abstract class GameObject {
             started = true
         }
 
+        if (shape.becameVisible)
+            onBecameVisible()
+
+        if (shape.becameInvisible)
+            onBecameInvisible()
+
         cycle()
     }
 
     fun display(canvas: Canvas)  {
-        shape.draw(position, canvas)
+        shape.cycle(position, canvas)
     }
 
     fun checkForCollisions() {
@@ -41,5 +49,4 @@ abstract class GameObject {
             }
         }
     }
-
 }
