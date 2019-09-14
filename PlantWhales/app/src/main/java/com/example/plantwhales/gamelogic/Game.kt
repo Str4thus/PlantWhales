@@ -13,7 +13,7 @@ import com.example.plantwhales.shapes.Rect
 import com.example.plantwhales.views.CanvasView
 
 object Game {
-    private val gameObjects: ArrayList<GameObject> = ArrayList()
+    private val gameObjects: ArrayList<GameObject> = ArrayList() // About 225 Objects run smooth
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
         private var time: Long = 0L
@@ -31,6 +31,10 @@ object Game {
                 freeObjects()
 
                 update()
+
+                checkForCollisions()
+                freeObjects()
+
                 draw()
             }
 

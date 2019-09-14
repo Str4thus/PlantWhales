@@ -26,21 +26,19 @@ class Player(override var shape: Shape) : GameObject() {
         this.position.x = InputSystem.touchPosition?.x ?: this.position.x
 
         if (!triggered && this.position.x > Game.screenSize.x / 2) {
-            for (i in 1..400) {
+            for (i in 1..50) {
                 Game.addGameObject(Projectile(Circle(80f, arrayOf(255, 255, 0, 0))))
             }
             triggered = true
         }
     }
 
-    override fun onCollisionEnter(other: Collider) {
-    }
+    override fun onCollisionEnter(other: Collider) {}
 
-    override fun onCollision(other: Collider) {
-    }
+    override fun onCollision(other: Collider) {}
 
-    override fun onCollisionExit(other: Collider) {
-    }
+    override fun onCollisionExit(other: Collider) {}
+
 
     override fun onBecameVisible() {}
 

@@ -14,7 +14,7 @@ import kotlin.random.Random
 class Projectile(override var shape: Shape) : GameObject() {
     override var collider: Collider = CircleCollider(this, (shape as Circle).radius)
     private val r: Random = Random(Time.currentTime())
-    private var speedMultiplier: Float = 2.5f
+    private var speedMultiplier: Float = 20.5f
 
     override fun start() {
         val xPos: Float = r.nextDouble(0.0, Game.screenSize.x.toDouble()).toFloat()
@@ -26,6 +26,7 @@ class Projectile(override var shape: Shape) : GameObject() {
     }
 
     override fun onCollisionEnter(other: Collider) {
+        Game.pause()
     }
 
     override fun onCollision(other: Collider) {

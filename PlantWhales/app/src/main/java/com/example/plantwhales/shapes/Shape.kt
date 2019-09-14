@@ -6,7 +6,7 @@ import com.example.plantwhales.maths.Vector2
 
 abstract class Shape(argb: Array<Int>) {
     var paint: Paint = Paint()
-    var isVisible: Boolean = true; protected set
+    var isVisible: Boolean = false; protected set
 
     var becameVisible: Boolean = false; protected set
     var becameInvisible: Boolean = false; protected set
