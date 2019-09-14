@@ -1,8 +1,10 @@
 package com.example.plantwhales.gameobjects
 
 import android.graphics.Canvas
+import android.util.Log
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
+import com.example.plantwhales.gamelogic.Time
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Shape
 
@@ -43,9 +45,15 @@ abstract class GameObject {
         if (!started)
             return
 
+        var checkedGameObjects: ArrayList<GameObject> = ArrayList()
+
         for (otherGameObject: GameObject in Game.getGameObjects()) {
-            if (this != otherGameObject && collider.overlaps(otherGameObject.collider)) {
+            if (!checkedGameObjects.contains(this) && this != otherGameObject && collider.overlaps(otherGameObject.collider)) {
+
+                checkedGameObjects.addAll(arrayOf(this, otherGameObject))
+
                 this.onCollision(otherGameObject.collider)
+                otherGameObject.onCollision(this.collider)
             }
         }
     }

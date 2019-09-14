@@ -25,7 +25,9 @@ class Player(override var shape: Shape) : GameObject() {
         this.position.x = InputSystem.touchPosition?.x ?: this.position.x
 
         if (!triggered && this.position.x > Game.screenSize.x / 2) {
-            Game.addGameObject(Projectile(Circle(80f, arrayOf(255, 255, 0, 0))))
+            for (i in 1..400) {
+                Game.addGameObject(Projectile(Circle(80f, arrayOf(255, 255, 0, 0))))
+            }
             triggered = true
         }
     }
