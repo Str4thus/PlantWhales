@@ -1,5 +1,6 @@
 package com.example.plantwhales.gameobjects
 
+import android.util.Log
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.collision.RectCollider
 import com.example.plantwhales.gamelogic.Game
@@ -32,12 +33,16 @@ class Player(override var shape: Shape) : GameObject() {
         }
     }
 
+    override fun onCollisionEnter(other: Collider) {
+    }
+
     override fun onCollision(other: Collider) {
     }
 
-    override fun onBecameVisible() {
+    override fun onCollisionExit(other: Collider) {
     }
 
-    override fun onBecameInvisible() {
-    }
+    override fun onBecameVisible() {}
+
+    override fun onBecameInvisible() {}
 }

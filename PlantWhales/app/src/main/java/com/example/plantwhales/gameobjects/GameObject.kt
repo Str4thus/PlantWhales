@@ -18,7 +18,11 @@ abstract class GameObject {
 
     abstract fun start()
     abstract fun cycle()
+
+    abstract fun onCollisionEnter(other: Collider)
     abstract fun onCollision(other: Collider)
+    abstract fun onCollisionExit(other: Collider)
+
     abstract fun onBecameVisible()
     abstract fun onBecameInvisible()
 
@@ -45,16 +49,45 @@ abstract class GameObject {
         if (!started)
             return
 
-        var checkedGameObjects: ArrayList<GameObject> = ArrayList()
+        val checkedGameObjects: ArrayList<GameObject> = ArrayList()
 
         for (otherGameObject: GameObject in Game.getGameObjects()) {
-            if (!checkedGameObjects.contains(this) && this != otherGameObject && collider.overlaps(otherGameObject.collider)) {
+            val otherCollider: Collider = otherGameObject.collider
 
+            /** Prevent duplicate collision checking **/
+            if (!checkedGameObjects.contains(this) && this != otherGameObject) {
                 checkedGameObjects.addAll(arrayOf(this, otherGameObject))
 
-                this.onCollision(otherGameObject.collider)
-                otherGameObject.onCollision(this.collider)
+                /** If Collision **/
+                if (collider.overlaps(otherCollider)) {
+                    if (!this.collider.collidingObjects.contains(otherCollider)) {
+                        this.collider.collidingObjects.add(otherCollider)
+                        this.onCollisionEnter(otherCollider)
+                    }
+
+                    if (!otherCollider.collidingObjects.contains(this.collider)) {
+                        otherCollider.collidingObjects.add(this.collider)
+                        otherCollider.gameObject.onCollisionExit(this.collider)
+                    }
+                /** No Collision (anymore) **/
+                } else {
+                    if (this.collider.collidingObjects.contains(otherCollider)) {
+                        this.collider.collidingObjects.remove(otherCollider)
+                        this.onCollisionExit(otherCollider)
+                    }
+
+                    if (otherCollider.collidingObjects.contains(this.collider)) {
+                        otherCollider.collidingObjects.remove(this.collider)
+                        otherCollider.gameObject.onCollisionExit(this.collider)
+                    }
+                }
             }
         }
+
+        for (collider: Collider in this.collider.collidingObjects) {
+            this.onCollision(collider)
+        }
+
+        checkedGameObjects.clear() // ?
     }
 }

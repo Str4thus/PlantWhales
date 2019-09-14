@@ -25,9 +25,13 @@ class Projectile(override var shape: Shape) : GameObject() {
         this.position += Physics.gravity * speedMultiplier * Time.deltaTime
     }
 
+    override fun onCollisionEnter(other: Collider) {
+    }
+
     override fun onCollision(other: Collider) {
-        //Game.pause()
-        //Game.requestDelete(this)
+    }
+
+    override fun onCollisionExit(other: Collider) {
     }
 
     override fun onBecameVisible() {}
