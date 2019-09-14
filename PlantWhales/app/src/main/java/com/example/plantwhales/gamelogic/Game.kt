@@ -124,6 +124,7 @@ object Game {
         return gameObjects
     }
 
+    /** Delete objects that requested to be deleted **/
     fun freeObjects() {
         for (gameObject: GameObject in this.objectsToDelete) {
             gameObjects.remove(gameObject)

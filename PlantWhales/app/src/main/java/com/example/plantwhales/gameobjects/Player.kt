@@ -4,7 +4,6 @@ import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.InputSystem
-import com.example.plantwhales.gamelogic.Time
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.shapes.Shape
