@@ -25,6 +25,7 @@ class Projectile(override var shape: Shape) : GameObject() {
     }
 
     override fun onCollision(other: Collider) {
-        Game.requestDelete(this)
+        Game.pause()
+        //Game.requestDelete(this)
     }
 }

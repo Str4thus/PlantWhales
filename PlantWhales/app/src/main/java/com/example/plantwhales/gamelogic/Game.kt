@@ -1,16 +1,15 @@
 package com.example.plantwhales.gamelogic
 
 import android.app.Activity
-import android.content.Context
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 import android.view.ViewTreeObserver
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.gameobjects.GameObject
 import com.example.plantwhales.gameobjects.Player
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Circle
+import com.example.plantwhales.shapes.Rect
 import com.example.plantwhales.views.CanvasView
 
 object Game {
@@ -74,7 +73,8 @@ object Game {
     fun start(hostActivity: Activity) {
         if (!isRunning) {
             /** Create GameObjects that need to be there in the beginning **/
-            gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
+            //gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
+            gameObjects.add(Player(Rect(100f, 50f, arrayOf(255, 255, 0, 255))))
             /***************************************************************/
 
             init(hostActivity)
