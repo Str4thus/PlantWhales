@@ -9,85 +9,115 @@ import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Shape
 
 abstract class GameObject {
-    abstract var collider: Collider protected set
-    abstract var shape: Shape protected set
+    /** Factory **/
+    companion object {
+        fun create(type: Type): GameObject {
+            return when (type) {
+                Type.Player -> Player()
+                Type.Projectile -> Projectile()
+            }
+        }
+    }
+    enum class Type {
+        Player,
+        Projectile
+    }
 
+    /** Properties **/
+    var collider: Collider? = null; protected set
+    var shape: Shape? = null; protected set
     var position: Vector2 = Vector2(0f, 0f); protected set
-
     private var started: Boolean = false
 
+    /** Game Loop **/
     abstract fun start()
     abstract fun cycle()
 
-    abstract fun onCollisionEnter(other: Collider)
-    abstract fun onCollision(other: Collider)
-    abstract fun onCollisionExit(other: Collider)
+    /** Collision Callbacks**/
+    open fun onCollisionEnter(other: Collider) {}
+    open fun onCollision(other: Collider) {}
+    open fun onCollisionExit(other: Collider) {}
 
-    abstract fun onBecameVisible()
-    abstract fun onBecameInvisible()
+    /** Visibility Callbacks **/
+    open fun onBecameVisible() {}
+    open fun onBecameInvisible() {}
 
+
+    /** External **/
     fun update() {
         if (!started) {
             start()
             started = true
         }
 
-        if (shape.becameVisible)
+        if (shape?.becameVisible == true)
             onBecameVisible()
 
-        if (shape.becameInvisible)
+        if (shape?.becameInvisible == true)
             onBecameInvisible()
 
         cycle()
     }
 
     fun display(canvas: Canvas)  {
-        shape.cycle(position, canvas)
+        if (started)
+            shape?.cycle(position, canvas)
     }
 
     fun checkForCollisions() {
         if (!started)
             return
 
-        val checkedGameObjects: ArrayList<GameObject> = ArrayList()
+        val thisCollider: Collider = this.collider ?: return // Check if collider is attached
 
+        val checkedGameObjects: ArrayList<GameObject> = ArrayList()
         for (otherGameObject: GameObject in Game.getGameObjects()) {
-            val otherCollider: Collider = otherGameObject.collider
+            val otherCollider: Collider = otherGameObject.collider ?: return
 
             /** Prevent duplicate collision checking **/
             if (!checkedGameObjects.contains(this) && this != otherGameObject) {
                 checkedGameObjects.addAll(arrayOf(this, otherGameObject))
 
                 /** If Collision **/
-                if (collider.overlaps(otherCollider)) {
-                    if (!this.collider.collidingObjects.contains(otherCollider)) {
-                        this.collider.collidingObjects.add(otherCollider)
+                if (thisCollider.overlaps(otherCollider)) {
+                    if (!thisCollider.collidingObjects.contains(otherCollider)) {
+                        thisCollider.collidingObjects.add(otherCollider)
                         this.onCollisionEnter(otherCollider)
                     }
 
-                    if (!otherCollider.collidingObjects.contains(this.collider)) {
-                        otherCollider.collidingObjects.add(this.collider)
-                        otherCollider.gameObject.onCollisionExit(this.collider)
+                    if (!otherCollider.collidingObjects.contains(thisCollider)) {
+                        otherCollider.collidingObjects.add(thisCollider)
+                        otherCollider.gameObject.onCollisionEnter(thisCollider)
                     }
                 /** No Collision (anymore) **/
                 } else {
-                    if (this.collider.collidingObjects.contains(otherCollider)) {
-                        this.collider.collidingObjects.remove(otherCollider)
+                    if (thisCollider.collidingObjects.contains(otherCollider)) {
+                        thisCollider.collidingObjects.remove(otherCollider)
                         this.onCollisionExit(otherCollider)
                     }
 
-                    if (otherCollider.collidingObjects.contains(this.collider)) {
-                        otherCollider.collidingObjects.remove(this.collider)
-                        otherCollider.gameObject.onCollisionExit(this.collider)
+                    if (otherCollider.collidingObjects.contains(thisCollider)) {
+                        otherCollider.collidingObjects.remove(thisCollider)
+                        otherCollider.gameObject.onCollisionExit(thisCollider)
                     }
                 }
             }
         }
 
-        for (collider: Collider in this.collider.collidingObjects) {
+        for (collider: Collider in thisCollider.collidingObjects) {
             this.onCollision(collider)
         }
 
         checkedGameObjects.clear() // ?
     }
+
+    fun attachCollider(collider: Collider) {
+        collider.gameObject = this
+        this.collider = collider
+    }
+
+    fun attachShape(shape: Shape) {
+        this.shape = shape
+    }
+
 }
