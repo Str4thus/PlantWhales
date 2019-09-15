@@ -10,8 +10,8 @@ object ProtoManager {
         return protoList[name]
     }
 
-    fun instantiateProto(name: String): GameObject? {
-        return protoList[name]?.instantiate()
+    fun instantiateProto(name: String, params: Float): GameObject? {
+        return protoList[name]?.instantiate(params)
     }
 
     fun hasProto(name: String): Boolean {

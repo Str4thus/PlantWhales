@@ -6,9 +6,7 @@ import android.os.Handler
 import android.view.ViewTreeObserver
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.RectCollider
-import com.example.plantwhales.gameobjects.GameObject
-import com.example.plantwhales.gameobjects.Player
-import com.example.plantwhales.gameobjects.Projectile
+import com.example.plantwhales.gameobjects.*
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.proto.Proto
 import com.example.plantwhales.shapes.Circle
@@ -19,10 +17,18 @@ object Game {
     private val gameObjects: ArrayList<GameObject> = ArrayList() // About 225 Objects run smooth
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
+        private var firstLoop: Boolean = true
+
         private var time: Long = 0L
         private var lastTime: Long = 0L
 
         override fun run() {
+            if (firstLoop) { // Prevent extraordinary high first delta time
+                time = Time.currentTime()
+                lastTime = time
+                firstLoop = false
+            }
+
             // Calculate delta time
             time = Time.currentTime()
             Time.setDeltaTime((time - lastTime))
@@ -64,6 +70,12 @@ object Game {
 
                 /** Set global Game Properties **/
                 screenSize = Vector2(canvas.width.toFloat(), canvas.height.toFloat())
+
+
+                if (ProtoManager.hasProto("LeftPaddle"))
+                    gameObjects.add(ProtoManager.instantiateProto("LeftPaddle", 30f)!!)
+                if (ProtoManager.hasProto("RightPaddle"))
+                    gameObjects.add(ProtoManager.instantiateProto("RightPaddle", Game.screenSize.x - 30f)!!)
                 /*****************************/
 
                 val obs = canvas.viewTreeObserver
@@ -79,8 +91,8 @@ object Game {
     // Game Start
     fun start(hostActivity: Activity) {
         if (!isRunning) {
-            /** Create GameObjects that need to be there in the beginning **/
-            //gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
+            /** Create GameObjects that need to be there in the beginning
+            // Creating Protos
             val player: Proto<Player> = Proto(GameObject.Type.Player)
             player.shape = Rect(200f, 100f, arrayOf(255, 255, 255, 0))
             player.collider = RectCollider(200f, 100f)
@@ -91,9 +103,32 @@ object Game {
             projectile.collider = CircleCollider(50f)
             ProtoManager.addProto("Projectile", projectile)
 
+            // Adding
             if (ProtoManager.getProto("Player") != null)
-                gameObjects.add(ProtoManager.instantiateProto("Player")!!)
+            gameObjects.add(ProtoManager.instantiateProto("Player")!!)
+            /***************************************************************/ */
 
+
+            /** Create GameObjects that need to be there in the beginning **/
+            // Creating Protos
+            val ball: Proto<Ball> = Proto(GameObject.Type.Ball)
+            ball.shape = Circle(50f, arrayOf(255, 255, 0, 255))
+            ball.collider = CircleCollider(50f)
+            ProtoManager.addProto("Ball", ball)
+
+            val leftPaddle: Proto<Paddle> = Proto(GameObject.Type.Paddle)
+            leftPaddle.shape = Rect(30f, 200f, arrayOf(255, 255, 0, 255))
+            leftPaddle.collider = RectCollider(30f, 200f)
+            ProtoManager.addProto("LeftPaddle", leftPaddle)
+
+            val rightPaddle: Proto<Paddle> = Proto(GameObject.Type.Paddle)
+            rightPaddle.shape = Rect(30f, 200f, arrayOf(255, 255, 0, 255))
+            rightPaddle.collider = RectCollider(30f, 200f)
+            ProtoManager.addProto("RightPaddle", rightPaddle)
+
+            // Adding
+            if (ProtoManager.hasProto("Ball"))
+                gameObjects.add(ProtoManager.instantiateProto("Ball", 0f)!!)
             /***************************************************************/
 
             init(hostActivity)

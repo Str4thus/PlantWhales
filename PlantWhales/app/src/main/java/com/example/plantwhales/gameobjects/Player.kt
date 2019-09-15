@@ -18,7 +18,7 @@ class Player : GameObject() {
 
         if (!triggered && this.position.x > Game.screenSize.x / 2) {
             if (ProtoManager.hasProto("Projectile")) {
-                Game.addGameObject(ProtoManager.instantiateProto("Projectile")!!)
+                //Game.addGameObject(ProtoManager.instantiateProto("Projectile")!!)
             }
 
             triggered = true

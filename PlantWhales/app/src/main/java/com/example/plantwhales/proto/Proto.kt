@@ -3,6 +3,7 @@ package com.example.plantwhales.proto
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gameobjects.GameObject
+import com.example.plantwhales.gameobjects.Paddle
 import com.example.plantwhales.gameobjects.Player
 import com.example.plantwhales.shapes.Shape
 import kotlin.reflect.KClass
@@ -11,7 +12,7 @@ class Proto<T : GameObject>(var type: GameObject.Type) {
     var collider: Collider? = null
     var shape: Shape? = null
 
-    fun instantiate(): T {
+    fun instantiate(params: Float): T {
         val gameObject: T = GameObject.create(type) as T
 
         if (collider != null)
@@ -19,6 +20,10 @@ class Proto<T : GameObject>(var type: GameObject.Type) {
 
         if (shape != null)
             gameObject.attachShape(shape!!)
+
+        if (type == GameObject.Type.Paddle) {
+            (gameObject as Paddle).xPos = params
+        }
 
         return gameObject
     }

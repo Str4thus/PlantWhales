@@ -15,12 +15,16 @@ abstract class GameObject {
             return when (type) {
                 Type.Player -> Player()
                 Type.Projectile -> Projectile()
+                Type.Paddle -> Paddle()
+                Type.Ball -> Ball()
             }
         }
     }
     enum class Type {
         Player,
-        Projectile
+        Projectile,
+        Paddle,
+        Ball
     }
 
     /** Properties **/
