@@ -2,13 +2,14 @@ package com.example.plantwhales.gameobjects
 
 import android.graphics.Canvas
 import android.util.Log
+import com.example.plantwhales.IDisplayable
 import com.example.plantwhales.collision.Collider
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.Time
 import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.shapes.Shape
 
-abstract class GameObject {
+abstract class GameObject : IDisplayable {
     /** Factory **/
     companion object {
         fun create(type: Type): GameObject {
@@ -44,6 +45,11 @@ abstract class GameObject {
         Game.requestDelete(this)
     }
 
+    /** Inherited **/
+    override fun display(canvas: Canvas)  {
+        if (started)
+            shape?.cycle(position, canvas)
+    }
 
     /** External **/
     fun update() {
@@ -59,11 +65,6 @@ abstract class GameObject {
             onBecameInvisible()
 
         cycle()
-    }
-
-    fun display(canvas: Canvas)  {
-        if (started)
-            shape?.cycle(position, canvas)
     }
 
     fun checkForCollisions() {

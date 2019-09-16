@@ -5,14 +5,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MotionEvent
+import android.view.Window
+import android.view.WindowManager
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.InputSystem
 
-/* TODO Prototype-System */
 class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        supportActionBar!!.hide() // hide the title bar
     }
 
     override fun onResume() {
@@ -26,8 +28,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        InputSystem.handle(event)
-        return false
+        InputSystem.handleTouchEvent(event)
+        return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {

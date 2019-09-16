@@ -21,7 +21,9 @@ abstract class Shape(argb: Array<Int>) {
     }
 
     protected abstract fun draw(position: Vector2, canvas: Canvas)
-    protected abstract fun checkVisibility(position: Vector2): Boolean
+    protected open fun checkVisibility(position: Vector2): Boolean {
+        return true
+    }
 
     fun cycle(position: Vector2, canvas: Canvas) {
         becameInvisible = false

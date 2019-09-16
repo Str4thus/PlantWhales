@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import com.example.plantwhales.IDisplayable
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gameobjects.GameObject
 import com.example.plantwhales.shapes.Shape
@@ -12,16 +14,16 @@ import com.example.plantwhales.ui.UIElement
 
 class CanvasView(context: Context) : View(context) {
     var backgroundColor: Paint = Paint()
-    var gameObjectsToDraw: ArrayList<GameObject> = ArrayList()
-    var uiElementsToDraw: ArrayList<UIElement> = ArrayList()
+    var gameObjectsToDraw: ArrayList<IDisplayable> = ArrayList()
+    var uiElementsToDraw: ArrayList<IDisplayable> = ArrayList()
 
     init {
-        backgroundColor.setARGB(255, 0, 255, 0)
+        backgroundColor.setARGB(255, 142, 142, 142)
     }
 
     override fun onDraw(canvas: Canvas) {
         // Draw GameObjects
-        for (gameObject: GameObject in gameObjectsToDraw) {
+        for (gameObject: IDisplayable in gameObjectsToDraw) {
             gameObject.display(canvas)
         }
 
@@ -42,8 +44,8 @@ class CanvasView(context: Context) : View(context) {
             canvas.drawRect(Game.screenSize.x - Game.playFieldRightMargin, Game.playFieldTopMargin, Game.screenSize.x, Game.screenSize.y - Game.playFieldBottomMargin, backgroundColor)
 
         // Draw UIElements
-        for (uiElement: UIElement in uiElementsToDraw) {
-            uiElement.draw(canvas)
+        for (uiElement: IDisplayable in uiElementsToDraw) {
+            uiElement.display(canvas)
         }
     }
 }

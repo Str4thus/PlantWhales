@@ -1,18 +1,34 @@
 package com.example.plantwhales.gamelogic
 
+import android.util.Log
 import android.view.MotionEvent
+import com.example.plantwhales.ITouchable
+import com.example.plantwhales.gameobjects.GameObject
 import com.example.plantwhales.maths.Vector2
 
 object InputSystem {
     var touchPosition: Vector2? = null
     var touched: Boolean = false
 
-    fun handle(event: MotionEvent) {
-        touchPosition = Vector2(event.x, event.y)
+    fun handleTouchEvent(event: MotionEvent) {
+        val canvasPositionInActivity: IntArray = IntArray(2)
+        Game.canvas.getLocationOnScreen(canvasPositionInActivity)
 
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> touched = true
-            MotionEvent.ACTION_UP -> touched = false
+        val eventPosition: Vector2 = Vector2(event.x - canvasPositionInActivity[0].toFloat(),
+                                             event.y - canvasPositionInActivity[1].toFloat())
+
+        for (uiElement: ITouchable in Game.getUIElements()) {
+            if (uiElement.pointLiesInside(eventPosition)) {
+                uiElement.onTouch(event)
+                return
+            }
+        }
+
+        for (gameObject: GameObject in Game.getGameObjects()) {
+            if (gameObject is ITouchable && (gameObject as ITouchable).pointLiesInside(eventPosition)) {
+                (gameObject as ITouchable).onTouch(event)
+                return
+            }
         }
     }
 }

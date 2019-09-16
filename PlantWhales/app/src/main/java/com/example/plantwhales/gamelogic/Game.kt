@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
+import com.example.plantwhales.IDisplayable
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.RectCollider
 import com.example.plantwhales.gameobjects.GameObject
@@ -66,7 +67,7 @@ object Game {
     var playFieldLeftMargin: Float = 0f; private set
     var playFieldRightMargin: Float = 0f; private set
     var playFieldTopMargin: Float = 0f; private set
-    var playFieldBottomMargin: Float = 0f; private set
+    var playFieldBottomMargin: Float = 200f; private set
 
     var playFieldBottom: Float = -1f; private set
     var playFieldTop: Float = -1f; private set
@@ -79,9 +80,9 @@ object Game {
     lateinit var canvas: CanvasView private set
 
 
-    private fun initializeUI (context: Context) {
-        var virtualStick: VirtualStick = VirtualStick(context)
-        uiElements.add(VirtualStick(context))
+    private fun initializeUI () {
+        val virtualStick: VirtualStick = VirtualStick(150f, 150f, arrayOf(255, 255, 0, 255))
+        uiElements.add(virtualStick)
     }
 
     private fun initializeGameObjects() {
@@ -93,7 +94,7 @@ object Game {
 
         // Projectile
         val projectile: Proto<Projectile> = Proto(GameObject.Type.Projectile)
-        projectile.shape = Rect(100f, 100f, arrayOf(255, 255, 0, 255))//Circle(50f, arrayOf(255, 255, 0, 255))
+        projectile.shape = Circle(50f, arrayOf(255, 255, 0, 255))
         projectile.collider = CircleCollider(50f)
         ProtoManager.addProto("Projectile", projectile)
 
@@ -102,7 +103,9 @@ object Game {
     }
 
     // Game Setup
-    private fun init() {
+    private fun init(context: Context) {
+        /** Creating canvas **/
+        canvas = CanvasView(context)
         val vto = canvas.viewTreeObserver
         vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -119,6 +122,11 @@ object Game {
                 playFieldRight = screenSize.x - playFieldRightMargin
                 /*****************************/
 
+
+                /** Create UI Elements that need to be there in the beginning **/
+                initializeUI()
+                /***************************************************************/
+
                 val obs = canvas.viewTreeObserver
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     obs.removeOnGlobalLayoutListener(this)
@@ -132,18 +140,11 @@ object Game {
     // Game Start
     fun start(hostActivity: Activity) {
         if (!isRunning) {
-            /** Creating canvas **/
-            canvas = CanvasView(hostActivity.applicationContext)
-
-            /** Create UI Elements that need to be there in the beginning **/
-            initializeUI(hostActivity.applicationContext)
-            /***************************************************************/
-
             /** Create GameObjects that need to be there in the beginning **/
             initializeGameObjects()
             /***************************************************************/
 
-            init()
+            init(hostActivity.applicationContext)
             hostActivity.setContentView(canvas)
 
             loopHandler.post(gameLoop)
@@ -177,8 +178,8 @@ object Game {
 
     // Display Objects
     private fun draw() {
-        canvas.gameObjectsToDraw = this.gameObjects
-        canvas.uiElementsToDraw = this.uiElements
+        canvas.gameObjectsToDraw = this.gameObjects as ArrayList<IDisplayable> // safe I guess
+        canvas.uiElementsToDraw = this.uiElements as ArrayList<IDisplayable> // safe I guess
         canvas.invalidate() // redraw
     }
 
@@ -190,6 +191,17 @@ object Game {
     fun getGameObjects(): ArrayList<GameObject> {
         return gameObjects
     }
+
+
+    /** DO NOT ADD UI ELEMENTS VIA THE MAIN THREAD (?) **/
+    fun addUIElement(uiElement: UIElement) {
+        uiElements.add(uiElement)
+    }
+
+    fun getUIElements(): ArrayList<UIElement> {
+        return uiElements
+    }
+
 
     /** Delete objects that requested to be deleted **/
     fun freeObjects() {
