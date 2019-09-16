@@ -19,10 +19,16 @@ object Game {
     private val gameObjects: ArrayList<GameObject> = ArrayList() // About 225 Objects run smooth
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
+        private var firstLoop: Boolean = true
         private var time: Long = 0L
         private var lastTime: Long = 0L
 
         override fun run() {
+            if (firstLoop) { // Prevent extraordinary high first delta time
+                time = Time.currentTime()
+                lastTime = time
+                firstLoop = false
+            }
             // Calculate delta time
             time = Time.currentTime()
             Time.setDeltaTime((time - lastTime))
