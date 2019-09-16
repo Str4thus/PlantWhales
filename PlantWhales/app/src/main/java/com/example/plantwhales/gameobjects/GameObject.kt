@@ -40,7 +40,9 @@ abstract class GameObject {
 
     /** Visibility Callbacks **/
     open fun onBecameVisible() {}
-    open fun onBecameInvisible() {}
+    open fun onBecameInvisible() {
+        Game.requestDelete(this)
+    }
 
 
     /** External **/

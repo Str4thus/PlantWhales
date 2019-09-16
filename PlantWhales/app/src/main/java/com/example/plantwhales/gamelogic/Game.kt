@@ -1,8 +1,10 @@
 package com.example.plantwhales.gamelogic
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.os.Handler
+import android.view.View
 import android.view.ViewTreeObserver
 import com.example.plantwhales.collision.CircleCollider
 import com.example.plantwhales.collision.RectCollider
@@ -13,10 +15,15 @@ import com.example.plantwhales.maths.Vector2
 import com.example.plantwhales.proto.Proto
 import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.shapes.Rect
+import com.example.plantwhales.shapes.Shape
+import com.example.plantwhales.ui.UIElement
+import com.example.plantwhales.ui.VirtualStick
 import com.example.plantwhales.views.CanvasView
 
 object Game {
+    private val uiElements: ArrayList<UIElement> = ArrayList() // UI Elements
     private val gameObjects: ArrayList<GameObject> = ArrayList() // About 225 Objects run smooth
+
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
         private var firstLoop: Boolean = true
@@ -53,23 +60,63 @@ object Game {
 
     private val objectsToDelete: ArrayList<GameObject> = ArrayList()
 
-    lateinit var screenSize: Vector2 private set
+    var isRunning: Boolean = false; private set
+    var isPaused: Boolean = false; private set
+
+    var playFieldLeftMargin: Float = 0f; private set
+    var playFieldRightMargin: Float = 0f; private set
+    var playFieldTopMargin: Float = 0f; private set
+    var playFieldBottomMargin: Float = 0f; private set
+
+    var playFieldBottom: Float = -1f; private set
+    var playFieldTop: Float = -1f; private set
+    var playFieldLeft: Float = -1f; private set
+    var playFieldRight: Float = -1f; private set
+
+    lateinit var playFieldSize: Vector2 private set // Restraint Space (applied Margins)
+
+    lateinit var screenSize: Vector2 private set // Whole Canvas
     lateinit var canvas: CanvasView private set
 
-    var isRunning: Boolean = false
-    var isPaused: Boolean = false
+
+    private fun initializeUI (context: Context) {
+        var virtualStick: VirtualStick = VirtualStick(context)
+        uiElements.add(VirtualStick(context))
+    }
+
+    private fun initializeGameObjects() {
+        // Player
+        val player: Proto<Player> = Proto(GameObject.Type.Player)
+        player.shape = Rect(200f, 100f, arrayOf(255, 255, 255, 0))
+        player.collider = RectCollider(200f, 100f)
+        ProtoManager.addProto("Player", player)
+
+        // Projectile
+        val projectile: Proto<Projectile> = Proto(GameObject.Type.Projectile)
+        projectile.shape = Rect(100f, 100f, arrayOf(255, 255, 0, 255))//Circle(50f, arrayOf(255, 255, 0, 255))
+        projectile.collider = CircleCollider(50f)
+        ProtoManager.addProto("Projectile", projectile)
+
+        if (ProtoManager.getProto("Player") != null)
+            gameObjects.add(ProtoManager.instantiateProto("Player")!!)
+    }
 
     // Game Setup
-    private fun init(hostActivity: Activity) {
-        /** Creating canvas **/
-        canvas = CanvasView(hostActivity.applicationContext)
-
+    private fun init() {
         val vto = canvas.viewTreeObserver
         vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
                 /** Set global Game Properties **/
                 screenSize = Vector2(canvas.width.toFloat(), canvas.height.toFloat())
+
+                playFieldSize = Vector2(canvas.width.toFloat() - (playFieldRightMargin + playFieldLeftMargin),
+                    canvas.height.toFloat() - (playFieldTopMargin + playFieldBottomMargin))
+
+                playFieldTop = playFieldTopMargin
+                playFieldBottom = screenSize.y - playFieldBottomMargin
+                playFieldLeft = playFieldLeftMargin
+                playFieldRight = screenSize.x - playFieldRightMargin
                 /*****************************/
 
                 val obs = canvas.viewTreeObserver
@@ -85,24 +132,18 @@ object Game {
     // Game Start
     fun start(hostActivity: Activity) {
         if (!isRunning) {
-            /** Create GameObjects that need to be there in the beginning **/
-            //gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
-            val player: Proto<Player> = Proto(GameObject.Type.Player)
-            player.shape = Rect(200f, 100f, arrayOf(255, 255, 255, 0))
-            player.collider = RectCollider(200f, 100f)
-            ProtoManager.addProto("Player", player)
+            /** Creating canvas **/
+            canvas = CanvasView(hostActivity.applicationContext)
 
-            val projectile: Proto<Projectile> = Proto(GameObject.Type.Projectile)
-            projectile.shape = Circle(50f, arrayOf(255, 255, 0, 255))
-            projectile.collider = CircleCollider(50f)
-            ProtoManager.addProto("Projectile", projectile)
-
-            if (ProtoManager.getProto("Player") != null)
-                gameObjects.add(ProtoManager.instantiateProto("Player")!!)
-
+            /** Create UI Elements that need to be there in the beginning **/
+            initializeUI(hostActivity.applicationContext)
             /***************************************************************/
 
-            init(hostActivity)
+            /** Create GameObjects that need to be there in the beginning **/
+            initializeGameObjects()
+            /***************************************************************/
+
+            init()
             hostActivity.setContentView(canvas)
 
             loopHandler.post(gameLoop)
@@ -136,7 +177,8 @@ object Game {
 
     // Display Objects
     private fun draw() {
-        canvas.objectsToDraw = gameObjects
+        canvas.gameObjectsToDraw = this.gameObjects
+        canvas.uiElementsToDraw = this.uiElements
         canvas.invalidate() // redraw
     }
 

@@ -23,10 +23,10 @@ class Rect(var width: Float, var height: Float, argb: Array<Int>) : Shape(argb) 
     override fun checkVisibility(position: Vector2): Boolean {
         var visibility: Boolean = true
 
-        if ((position.x + width / 2) < 0
-            || (position.x - width / 2) > Game.screenSize.x
-            || (position.y + height / 2) < 0
-            || (position.y - height / 2) > Game.screenSize.y) {
+        if ((position.x + width / 2) < Game.playFieldLeft
+            || (position.x - width / 2) > Game.playFieldRight
+            || (position.y + height / 2) < Game.playFieldTop
+            || (position.y - height / 2) > Game.playFieldBottom) {
             visibility = false
         }
 

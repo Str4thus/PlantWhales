@@ -12,14 +12,19 @@ class Projectile : GameObject() {
     private var speedMultiplier: Float = 4.5f
 
     override fun start() {
-        this.position = Vector2(Game.screenSize.x / 2, 50f)
+        //this.position = Vector2(Game.playFieldRight/ 2, Game.playFieldTop + (shape as Circle).radius)
+        this.position = Vector2(Game.playFieldRight/ 2, Game.playFieldBottom / 2)
     }
 
     override fun cycle() {
-        this.position += Physics.gravity * speedMultiplier * Time.deltaTime
+        this.position += Vector2(10f, 0f) * -speedMultiplier * Time.deltaTime
     }
 
     override fun onCollisionEnter(other: Collider) {
+        Game.pause()
+    }
+
+    override fun onBecameInvisible() {
         Game.pause()
     }
 }

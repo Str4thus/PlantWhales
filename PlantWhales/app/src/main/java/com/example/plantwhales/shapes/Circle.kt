@@ -13,10 +13,10 @@ class Circle(var radius: Float, argb: Array<Int>) : Shape(argb) {
     override fun checkVisibility(position: Vector2): Boolean {
         var visibility: Boolean = true
 
-        if ((position.x + radius) < 0
-            || (position.x - radius) > Game.screenSize.x
-            || (position.y + radius) < 0
-            || (position.y - radius) > Game.screenSize.y) {
+        if ((position.x + radius) < Game.playFieldLeft
+            || (position.x - radius) > Game.playFieldRight
+            || (position.y + radius) < Game.playFieldTop
+            || (position.y - radius) > Game.playFieldBottom) {
             visibility = false
         }
 
