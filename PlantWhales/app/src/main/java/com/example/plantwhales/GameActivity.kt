@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import com.example.plantwhales.gamelogic.Game
 import com.example.plantwhales.gamelogic.InputSystem
 
+/* TODO Prototype-System */
 class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

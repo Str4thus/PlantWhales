@@ -8,7 +8,7 @@ import kotlin.math.abs
 import kotlin.math.pow
 
 object Physics {
-    var gravity: Vector2 = Vector2(1f, 9.81f); private set
+    var gravity: Vector2 = Vector2(0f, 9.81f); private set
 
     fun doOverlap(a: Collider, b: Collider): Boolean {
         /** Circle + Circle **/

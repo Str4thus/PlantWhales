@@ -5,15 +5,18 @@ import android.os.Build
 import android.os.Handler
 import android.view.ViewTreeObserver
 import com.example.plantwhales.collision.CircleCollider
+import com.example.plantwhales.collision.RectCollider
 import com.example.plantwhales.gameobjects.GameObject
 import com.example.plantwhales.gameobjects.Player
+import com.example.plantwhales.gameobjects.Projectile
 import com.example.plantwhales.maths.Vector2
+import com.example.plantwhales.proto.Proto
 import com.example.plantwhales.shapes.Circle
 import com.example.plantwhales.shapes.Rect
 import com.example.plantwhales.views.CanvasView
 
 object Game {
-    private val gameObjects: ArrayList<GameObject> = ArrayList()
+    private val gameObjects: ArrayList<GameObject> = ArrayList() // About 225 Objects run smooth
     private val loopHandler: Handler = Handler()
     private val gameLoop: Runnable = object: Runnable {
         private var time: Long = 0L
@@ -31,6 +34,10 @@ object Game {
                 freeObjects()
 
                 update()
+
+                checkForCollisions()
+                freeObjects()
+
                 draw()
             }
 
@@ -74,7 +81,19 @@ object Game {
         if (!isRunning) {
             /** Create GameObjects that need to be there in the beginning **/
             //gameObjects.add(Player(Circle(50f, arrayOf(255, 255, 0, 255))))
-            gameObjects.add(Player(Rect(100f, 50f, arrayOf(255, 255, 0, 255))))
+            val player: Proto<Player> = Proto(GameObject.Type.Player)
+            player.shape = Rect(200f, 100f, arrayOf(255, 255, 255, 0))
+            player.collider = RectCollider(200f, 100f)
+            ProtoManager.addProto("Player", player)
+
+            val projectile: Proto<Projectile> = Proto(GameObject.Type.Projectile)
+            projectile.shape = Circle(50f, arrayOf(255, 255, 0, 255))
+            projectile.collider = CircleCollider(50f)
+            ProtoManager.addProto("Projectile", projectile)
+
+            if (ProtoManager.getProto("Player") != null)
+                gameObjects.add(ProtoManager.instantiateProto("Player")!!)
+
             /***************************************************************/
 
             init(hostActivity)
