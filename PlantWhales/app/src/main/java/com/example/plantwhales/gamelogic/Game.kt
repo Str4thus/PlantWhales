@@ -81,7 +81,7 @@ object Game {
 
 
     private fun initializeUI () {
-        val virtualStick: VirtualStick = VirtualStick(150f, 150f, arrayOf(255, 255, 0, 255))
+        val virtualStick: VirtualStick = VirtualStick(100f, arrayOf(255, 255, 0, 255))
         uiElements.add(virtualStick)
     }
 
